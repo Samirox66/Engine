@@ -9,15 +9,16 @@ class Wrapper
 {
 public:
 	template <typename Obj, typename... Args>
-	Wrapper(Obj* obj, int (Obj::*func)(Args...), const std::vector<std::pair<std::string, int>>& params)
+	Wrapper(Obj* obj, int (Obj::*func)(Args...), std::vector<std::pair<std::string, int>> const& params)
 	{
 		for (auto& param : params)
 		{
 			_params.insert(param);
 		}
+
 		if (params.size() != _params.size())
 		{
-			throw std::exception("Params name should be unqiue");
+			throw std::exception("Params name should be unique");
 		}
 		
 		_func = [obj, func](std::vector<int>& params)
@@ -26,22 +27,30 @@ public:
 		};
 	}
 
-	Wrapper(Wrapper const&) = default;
-	Wrapper& operator=(Wrapper const&) = default;
+	Wrapper(Wrapper const&) = delete;
+	Wrapper& operator=(Wrapper const&) = delete;
+	Wrapper(Wrapper&&) = default;
+	Wrapper& operator=(Wrapper&&) = default;
+	~Wrapper() = default;
 
 	template <typename Obj, typename... Args, size_t... I>
-	static int execFunc(Obj* obj, int (Obj::* func)(Args...), std::vector<int> params, std::index_sequence<I...>)
+	static int execFunc(Obj* obj, int (Obj::* func)(Args...), std::vector<int> const& params, std::index_sequence<I...>)
 	{
 		return (obj->*func)(params[I]...);
 	}
 
 
-	int execute(const std::vector<std::pair<std::string, int>>& params)
+	int execute(std::vector<std::pair<std::string, int>> const& params)
 	{
 		std::map<std::string, int> sortedParams;
 		for (auto& param : params)
 		{
 			sortedParams.insert(param);
+		}
+
+		if (sortedParams.size() != _params.size())
+		{
+			throw std::exception("Params name should be unqiue");
 		}
 		
 		std::vector<int> checkedParams;
@@ -51,6 +60,7 @@ public:
 			{
 				throw std::exception("Wrong args name");
 			}
+
 			checkedParams.push_back(gettedParamIt->second);
 		}
 

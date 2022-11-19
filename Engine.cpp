@@ -1,7 +1,7 @@
 ﻿#include "Engine.h"
 #include <iostream>
 
-void Engine::register_command(Wrapper* wrapper, std::string command)
+void Engine::register_command(Wrapper* wrapper, std::string const& command)
 {
 	if (commands.find(command) != commands.end())
 	{
@@ -12,7 +12,7 @@ void Engine::register_command(Wrapper* wrapper, std::string command)
 	commands[command] = wrapper;
 }
 
-int Engine::execute(std::string command, const std::vector<std::pair<std::string, int>>& params)
+int Engine::execute(std::string const& command, std::vector<std::pair<std::string, int>> const& params)
 {
 	std::map<std::string, Wrapper*>::iterator it;
 	if ((it = commands.find(command)) == commands.end())
